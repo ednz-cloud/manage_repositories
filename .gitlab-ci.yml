@@ -1,0 +1,82 @@
+---
+stages:
+  - verify
+  - test-default
+  - test-with-custom-repo
+
+image:
+  name: registry.ednz.fr/forge/ansible-runner
+
+variables:
+  ANSIBLE_HOST_KEY_CHECKING: 'false'
+  ANSIBLE_FORCE_COLOR: 'true'
+  ANSIBLE_PYTHON_INTERPRETER: /usr/bin/python3
+  DOCKER_AUTH_CONFIG: $CI_DOCKER_AUTH_CONFIG
+
+.stage-test-default:
+  stage: test-default
+
+.stage-test-with-custom-repo:
+  stage: test-with-custom-repo
+
+.variables-ubuntu-2004:
+  variables:
+    MOLECULE_TEST_OS: "ubuntu2004"
+
+.variables-ubuntu-2204:
+  variables:
+    MOLECULE_TEST_OS: "ubuntu2204"
+
+.variables-debian-11:
+  variables:
+    MOLECULE_TEST_OS: "debian11"
+
+.script-molecule-test-default:
+  script:
+    - molecule test
+
+.script-molecule-test-with-custom-repo:
+  script:
+    - molecule test -s with_custom_repo
+
+ansible-verify:
+  stage: verify
+  script:
+    - yamllint . -c .yamllint
+    - ansible-lint
+
+ansible-test-ubuntu-2004-default:
+  extends:
+    - .stage-test-default
+    - .variables-ubuntu-2004
+    - .script-molecule-test-default
+
+ansible-test-ubuntu-2204-default:
+  extends:
+    - .stage-test-default
+    - .variables-ubuntu-2204
+    - .script-molecule-test-default
+
+ansible-test-debian-11-default:
+  extends:
+    - .stage-test-default
+    - .variables-debian-11
+    - .script-molecule-test-default
+
+ansible-test-ubuntu-2004-with-custom-repo:
+  extends:
+    - .stage-test-with-custom-repo
+    - .variables-ubuntu-2004
+    - .script-molecule-test-with-custom-repo
+
+ansible-test-ubuntu-2204-with-custom-repo:
+  extends:
+    - .stage-test-with-custom-repo
+    - .variables-ubuntu-2204
+    - .script-molecule-test-with-custom-repo
+
+ansible-test-debian-11-with-custom-repo:
+  extends:
+    - .stage-test-with-custom-repo
+    - .variables-debian-11
+    - .script-molecule-test-with-custom-repo

@@ -1,0 +1,18 @@
+---
+# task/custom_repositories file for manage_repositories
+- name: "Download gpg key for custom repositories"
+  ansible.builtin.get_url:
+    url: "{{ item.gpg_key }}"
+    dest: "/usr/share/keyrings/{{ item.filename }}-archive-keyring.asc"
+    mode: '0644'
+  loop: "{{ manage_repositories_custom_repo }}"
+  when: item.gpg_key not in [None, '']
+
+- name: "Add custom repository into source.list.d/.list"
+  vars:
+    signed_by: "{% if item.gpg_key not in [None, ''] %}[signed-by=/usr/share/keyrings/{{ item.filename }}-archive-keyring.asc]{% endif %}"
+  ansible.builtin.apt_repository:
+    repo: "{{ item.type }} {% if signed_by != '' %}{{ signed_by }} {% endif %}{{ item.uri }} {{ item.suites }} {{ item.components }}"
+    state: "present"
+    filename: "{{ item.filename }}"
+  loop: "{{ manage_repositories_custom_repo }}"

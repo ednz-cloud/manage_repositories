@@ -1,0 +1,3 @@
+---
+# vars file for manage_repositories
+manage_repositories_default_repo_location: /etc/apt/sources.list

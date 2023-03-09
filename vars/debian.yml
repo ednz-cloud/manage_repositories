@@ -1,0 +1,31 @@
+---
+# vars file for manage_repositories
+manage_repositories_default_repo:
+  # debian main repository
+  - uri: "{{ manage_repositories_main_repo_uri[ansible_distribution|lower] }}"
+    gpg_key:
+    comments: "debian main repository"
+    type: "deb"
+    suites: "{{ ansible_distribution_release }}"
+    components: "main contrib"
+  # debian updates repository
+  - uri: "{{ manage_repositories_main_repo_uri[ansible_distribution|lower] }}"
+    gpg_key:
+    comments: "debian updates repository"
+    type: "deb"
+    suites: "{{ ansible_distribution_release }}-updates"
+    components: "main contrib"
+  # debian security repository
+  - uri: "{{ manage_repositories_main_repo_uri[ansible_distribution|lower] }}-security"
+    gpg_key:
+    comments: "debian security repository"
+    type: "deb"
+    suites: "{{ ansible_distribution_release }}-security"
+    components: "main contrib"
+  # debian backports repository
+  - uri: "{{ manage_repositories_main_repo_uri[ansible_distribution|lower] }}"
+    gpg_key:
+    comments: "debian backports repository"
+    type: "deb"
+    suites: "{{ ansible_distribution_release }}-backports"
+    components: "main"
