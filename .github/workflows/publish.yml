@@ -15,4 +15,4 @@ jobs:
       - name: Publish
         uses: ednxzu/galaxy-import-role@v1
         with:
-          galaxy-api-key: ${{ secrets.galaxy_api_key }}
+          galaxy-api-key: ${{ secrets.GALAXY_API_SECRET }}
