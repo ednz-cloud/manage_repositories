@@ -17,6 +17,7 @@ galaxy_info:
         - bullseye
   galaxy_tags:
     - 'ubuntu'
+    - 'debian'
     - 'repositories'
     - 'packages'
 
