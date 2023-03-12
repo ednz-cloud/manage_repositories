@@ -56,7 +56,7 @@ Including an example of how to use your role (for instance, with variables passe
 # calling the role inside a playbook with either the default or group_vars/host_vars
 - hosts: servers
   roles:
-    - manage_repositories
+    - ednxzu.manage_repositories
 ```
 
 ```yaml
@@ -65,7 +65,7 @@ Including an example of how to use your role (for instance, with variables passe
   tasks:
     - name: "Configure hashicorp repository"
       ansible.builtin.include_role: 
-        name: manage_repositories
+        name: ednxzu.manage_repositories
       vars:
         manage_repositories_enable_default_repo: false
         manage_repositories_enable_custom_repo: true
