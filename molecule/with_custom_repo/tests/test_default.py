@@ -1,5 +1,6 @@
 """Role testing files using testinfra."""
 
+
 def test_hosts_file(host):
     """Validate /etc/hosts file."""
     etc_hosts = host.file("/etc/hosts")
