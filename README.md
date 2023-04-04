@@ -51,7 +51,6 @@ None.
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 ```yaml
 # calling the role inside a playbook with either the default or group_vars/host_vars
 - hosts: servers
@@ -64,7 +63,7 @@ Including an example of how to use your role (for instance, with variables passe
 - hosts: servers
   tasks:
     - name: "Configure hashicorp repository"
-      ansible.builtin.include_role: 
+      ansible.builtin.include_role:
         name: ednxzu.manage_repositories
       vars:
         manage_repositories_enable_default_repo: false

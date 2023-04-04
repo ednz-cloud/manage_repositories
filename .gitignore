@@ -1,2 +1,2 @@
-# ignore molecule/testinfra pycache 
+# ignore molecule/testinfra pycache
 **/__pycache__
