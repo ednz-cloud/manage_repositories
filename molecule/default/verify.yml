@@ -1,0 +1,58 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: "Test: file /etc/hosts"
+      block:
+        - name: "Stat file /etc/hosts"
+          ansible.builtin.stat:
+            path: "/etc/hosts"
+          register: stat_etc_hosts
+
+        - name: "Verify file /etc/hosts"
+          ansible.builtin.assert:
+            that:
+              - stat_etc_hosts.stat.exists
+              - stat_etc_hosts.stat.isreg
+              - stat_etc_hosts.stat.pw_name == 'root'
+              - stat_etc_hosts.stat.gr_name == 'root'
+
+    - name: "Test: file /etc/apt/sources.list"
+      block:
+        - name: "Stat file /etc/apt/sources.list"
+          ansible.builtin.stat:
+            path: "/etc/apt/sources.list"
+          register: stat_etc_apt_sources_list
+
+        - name: "Slurp file /etc/apt/sources.list"
+          ansible.builtin.slurp:
+            src: "/etc/apt/sources.list"
+          register: slurp_etc_apt_sources_list
+
+        - name: "Verify file /etc/apt/sources.list"
+          ansible.builtin.assert:
+            that:
+              - stat_etc_apt_sources_list.stat.exists
+              - stat_etc_apt_sources_list.stat.isreg
+              - stat_etc_apt_sources_list.stat.pw_name == 'root'
+              - stat_etc_apt_sources_list.stat.gr_name == 'root'
+              - stat_etc_apt_sources_list.stat.mode == '0644'
+
+        - name: "Verify file /etc/apt/sources.list"
+          ansible.builtin.assert:
+            that:
+              - "('deb http://fr.archive.ubuntu.com/ubuntu ' + ansible_distribution_release + ' main restricted universe multiverse') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://fr.archive.ubuntu.com/ubuntu ' + ansible_distribution_release + '-updates main restricted universe multiverse') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://fr.archive.ubuntu.com/ubuntu ' + ansible_distribution_release + '-security main restricted universe multiverse') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://fr.archive.ubuntu.com/ubuntu ' + ansible_distribution_release + '-backports main restricted universe multiverse') in (slurp_etc_apt_sources_list.content|b64decode)"
+          when: (ansible_distribution|lower) == 'ubuntu'
+
+        - name: "Verify file /etc/apt/sources.list"
+          ansible.builtin.assert:
+            that:
+              - "('deb http://deb.debian.org/debian ' + ansible_distribution_release + ' main contrib') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://deb.debian.org/debian ' + ansible_distribution_release + '-updates main contrib') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://deb.debian.org/debian-security ' + ansible_distribution_release + '-security main contrib') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://deb.debian.org/debian ' + ansible_distribution_release + '-backports main') in (slurp_etc_apt_sources_list.content|b64decode)"
+          when: (ansible_distribution|lower) == 'debian'

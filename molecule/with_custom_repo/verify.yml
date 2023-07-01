@@ -1,0 +1,101 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: "Test: file /etc/hosts"
+      block:
+        - name: "Stat file /etc/hosts"
+          ansible.builtin.stat:
+            path: "/etc/hosts"
+          register: stat_etc_hosts
+
+        - name: "Verify file /etc/hosts"
+          ansible.builtin.assert:
+            that:
+              - stat_etc_hosts.stat.exists
+              - stat_etc_hosts.stat.isreg
+              - stat_etc_hosts.stat.pw_name == 'root'
+              - stat_etc_hosts.stat.gr_name == 'root'
+
+    - name: "Test: file /etc/apt/sources.list"
+      block:
+        - name: "Stat file /etc/apt/sources.list"
+          ansible.builtin.stat:
+            path: "/etc/apt/sources.list"
+          register: stat_etc_apt_sources_list
+
+        - name: "Slurp file /etc/apt/sources.list"
+          ansible.builtin.slurp:
+            src: "/etc/apt/sources.list"
+          register: slurp_etc_apt_sources_list
+
+        - name: "Verify file /etc/apt/sources.list"
+          ansible.builtin.assert:
+            that:
+              - stat_etc_apt_sources_list.stat.exists
+              - stat_etc_apt_sources_list.stat.isreg
+              - stat_etc_apt_sources_list.stat.pw_name == 'root'
+              - stat_etc_apt_sources_list.stat.gr_name == 'root'
+              - stat_etc_apt_sources_list.stat.mode == '0644'
+
+        - name: "Verify file /etc/apt/sources.list"
+          ansible.builtin.assert:
+            that:
+              - "('deb http://fr.archive.ubuntu.com/ubuntu ' + ansible_distribution_release + ' main restricted universe multiverse') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://fr.archive.ubuntu.com/ubuntu ' + ansible_distribution_release + '-updates main restricted universe multiverse') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://fr.archive.ubuntu.com/ubuntu ' + ansible_distribution_release + '-security main restricted universe multiverse') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://fr.archive.ubuntu.com/ubuntu ' + ansible_distribution_release + '-backports main restricted universe multiverse') in (slurp_etc_apt_sources_list.content|b64decode)"
+          when: (ansible_distribution|lower) == 'ubuntu'
+
+        - name: "Verify file /etc/apt/sources.list"
+          ansible.builtin.assert:
+            that:
+              - "('deb http://deb.debian.org/debian ' + ansible_distribution_release + ' main contrib') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://deb.debian.org/debian ' + ansible_distribution_release + '-updates main contrib') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://deb.debian.org/debian-security ' + ansible_distribution_release + '-security main contrib') in (slurp_etc_apt_sources_list.content|b64decode)"
+              - "('deb http://deb.debian.org/debian ' + ansible_distribution_release + '-backports main') in (slurp_etc_apt_sources_list.content|b64decode)"
+          when: (ansible_distribution|lower) == 'debian'
+
+    - name: "Test: directory /etc/apt/sources.list.d"
+      block:
+        - name: "Find in directory /etc/apt/sources.list.d"
+          ansible.builtin.find:
+            paths: /etc/apt/sources.list.d
+            file_type: file
+          register: find_etc_apt_sources_list_d
+
+        - name: "Stat in directory /etc/apt/sources.list.d"
+          ansible.builtin.stat:
+            path: "{{ item.path }}"
+          loop: "{{ find_etc_apt_sources_list_d.files }}"
+          register: stat_etc_apt_sources_list_d
+
+        - name: "Slurp in directory /etc/apt/sources.list.d"
+          ansible.builtin.slurp:
+            src: "{{ item.path }}"
+          loop: "{{ find_etc_apt_sources_list_d.files }}"
+          register: slurp_etc_apt_sources_list_d
+
+
+        - name: "Verify file /etc/apt/sources.list.d/docker.list"
+          ansible.builtin.assert:
+            that:
+              - item.item.isreg
+              - item.item.pw_name == 'root'
+              - item.item.gr_name == 'root'
+              - item.item.mode == '0644'
+              - "(item.content|b64decode) in ('deb [signed-by=/usr/share/keyrings/docker-archive-keyring.asc] https://download.docker.com/linux/' + (ansible_distribution|lower) + ' ' + ansible_distribution_release + ' stable\\n')"
+          loop: "{{ slurp_etc_apt_sources_list_d.results }}"
+          when: (item.item.path | basename | splitext | first) == 'docker'
+
+        - name: "Verify file /etc/apt/sources.list.d/hashicorp.list"
+          ansible.builtin.assert:
+            that:
+              - item.item.isreg
+              - item.item.pw_name == 'root'
+              - item.item.gr_name == 'root'
+              - item.item.mode == '0644'
+              - "(item.content|b64decode) in ('deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.asc] https://apt.releases.hashicorp.com ' + ansible_distribution_release + ' main\\n')"
+          loop: "{{ slurp_etc_apt_sources_list_d.results }}"
+          when: (item.item.path | basename | splitext | first) == 'hashicorp'
