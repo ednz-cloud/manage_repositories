@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+
+{% for repository in repositories %}
+# {{ repository.comments}}
+types: {{ repository.types | join(' ') }}
+uris: mirror+file://{{ manage_repositories_mirrors_location }}/{{ repository.name }}.list
+suites: {{ repository.suites | join(' ') }}
+components: {{ repository.components | join(' ') }}
+{% if (repository.options is defined) and repository.options %}
+{% for option in repository.options %}
+{{ option }}: {{ repository.options[option] }}
+{% endfor %}
+{% endif %}
+{% endfor %}

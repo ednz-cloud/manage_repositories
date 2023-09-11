@@ -1,3 +1,6 @@
 ---
 # vars file for manage_repositories
-manage_repositories_default_repo_location: /etc/apt/sources.list
+manage_repositories_sources_list_location: /etc/apt/sources.list
+manage_repositories_default_repo_location: "/etc/apt/sources.list.d/{{ ansible_distribution|lower }}.sources"
+manage_repositories_mirrors_location: /etc/apt/mirrors
+manage_repositories_sources_list_message: "# See /etc/apt/sources.list.d/{{ ansible_distribution|lower }}.sources\\n"

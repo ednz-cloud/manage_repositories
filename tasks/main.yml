@@ -4,16 +4,9 @@
   ansible.builtin.include_vars:
     file: "{{ ansible_distribution|lower }}.yml"
 
-- name: "Import main repositories"
+- name: "Import main {{ ansible_distribution|lower }} repositories"
+  ansible.builtin.include_tasks: "{{ ansible_distribution|lower }}.yml"
   when: manage_repositories_enable_default_repo
-  block:
-    - name: "Import ubuntu.yml"
-      ansible.builtin.include_tasks: ubuntu.yml
-      when: ansible_distribution == 'Ubuntu'
-
-    - name: "Import debian.yml"
-      ansible.builtin.include_tasks: debian.yml
-      when: ansible_distribution == 'Debian'
 
 - name: "Import custom_repositories.yml"
   ansible.builtin.include_tasks: custom_repositories.yml
