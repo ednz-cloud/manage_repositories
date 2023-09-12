@@ -33,7 +33,7 @@
     - name: "Populate mirrors files"
       ansible.builtin.copy:
         content: |
-          "{{ item.uri }}"
+          {{ item.uri }}
         dest: "{{ manage_repositories_mirrors_location }}/{{ item.name }}.list"
       loop: "{{ manage_repositories_default_repo }}"
 

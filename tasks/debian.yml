@@ -1,10 +1,47 @@
 ---
 # task/debian file for manage_repositories
-- name: "Configure ubuntu main repositories into sources.list"
+- name: "Emtpy /etc/apt/sources.list"
+  block:
+    - name: Read the current content of the file
+      ansible.builtin.slurp:
+        src: "{{ manage_repositories_sources_list_location }}"
+      register: sources_list_current_content
+      ignore_errors: true
+
+    - name: "Convert sources.list current content to string"
+      ansible.builtin.set_fact:
+        sources_list_current_content_str: "{{ (sources_list_current_content.content | b64decode) | default('') }}"
+
+    - name: "Define sources.list new content"
+      ansible.builtin.set_fact:
+        sources_list_new_content: "{{ manage_repositories_sources_list_message }}"
+
+    - name: "Replace content of /etc/apt/sources.list"
+      ansible.builtin.replace:
+        path: "{{ manage_repositories_sources_list_location }}"
+        regexp: "{{ sources_list_current_content_str | regex_escape }}"
+        replace: "{{ sources_list_new_content }}"
+      when: sources_list_current_content_str != sources_list_new_content
+
+- name: "Import list files"
+  block:
+    - name: "Create mirrors files"
+      ansible.builtin.file:
+        path: "{{ manage_repositories_mirrors_location }}"
+        state: directory
+
+    - name: "Populate mirrors files"
+      ansible.builtin.copy:
+        content: |
+          {{ item.uri }}
+        dest: "{{ manage_repositories_mirrors_location }}/{{ item.name }}.list"
+      loop: "{{ manage_repositories_default_repo }}"
+
+- name: "Configure debian main repositories into sources.list"
   vars:
     repositories: "{{ manage_repositories_default_repo }}"
   ansible.builtin.template:
-    src: "sources.list.j2"
+    src: "repo.sources.j2"
     dest: "{{ manage_repositories_default_repo_location }}"
     mode: '0644'
     owner: root
