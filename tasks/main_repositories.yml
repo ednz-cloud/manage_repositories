@@ -2,7 +2,7 @@
 # task/debian file for manage_repositories
 - name: "Emtpy /etc/apt/sources.list"
   block:
-    - name: Read the current content of the file
+    - name: "Read the current content of source.list"
       ansible.builtin.slurp:
         src: "{{ manage_repositories_sources_list_location }}"
       register: sources_list_current_content
@@ -10,11 +10,20 @@
 
     - name: "Convert sources.list current content to string"
       ansible.builtin.set_fact:
-        sources_list_current_content_str: "{{ (sources_list_current_content.content | b64decode) | default('') }}"
+        sources_list_current_content_str: "{{ (sources_list_current_content.content | default('')) | b64decode }}"
 
     - name: "Define sources.list new content"
       ansible.builtin.set_fact:
         sources_list_new_content: "{{ manage_repositories_sources_list_message }}"
+
+    - name: "Create file /etc/apt/sources.list"
+      ansible.builtin.file:
+        path: "{{ manage_repositories_sources_list_location }}"
+        state: touch
+        owner: root
+        group: root
+        mode: '0644'
+      when: sources_list_current_content_str == ''
 
     - name: "Replace content of /etc/apt/sources.list"
       ansible.builtin.replace:
@@ -23,28 +32,13 @@
         replace: "{{ sources_list_new_content }}"
       when: sources_list_current_content_str != sources_list_new_content
 
-- name: "Import list files"
-  block:
-    - name: "Create mirrors files"
-      ansible.builtin.file:
-        path: "{{ manage_repositories_mirrors_location }}"
-        state: directory
-
-    - name: "Populate mirrors files"
-      ansible.builtin.copy:
-        content: |
-          {{ item.uri }}
-        dest: "{{ manage_repositories_mirrors_location }}/{{ item.name }}.list"
-      loop: "{{ manage_repositories_default_repo }}"
-
-- name: "Configure debian main repositories into sources.list"
-  vars:
-    repositories: "{{ manage_repositories_default_repo }}"
-  ansible.builtin.template:
-    src: "repo.sources.j2"
-    dest: "{{ manage_repositories_default_repo_location }}"
-    mode: '0644'
-    owner: root
-    group: root
+- name: "Configure {{ ansible_distribution|lower }} main repositories into sources.list"
+  ansible.builtin.deb822_repository:
+    name: "{{ item.name }}"
+    types: "{{item.types}}"
+    uris: "{{ item.uri }}"
+    suites: "{{ item.suites | join(' ') }}"
+    components: "{{ item.components }}"
+  loop: "{{ manage_repositories_default_repo }}"
   notify:
     - "debian-based-cache-update"

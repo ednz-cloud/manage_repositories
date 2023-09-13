@@ -4,8 +4,11 @@
   ansible.builtin.include_vars:
     file: "{{ ansible_distribution|lower }}.yml"
 
+- name: "Import prerequisites.yml"
+  ansible.builtin.include_tasks: prerequisites.yml
+
 - name: "Import main {{ ansible_distribution|lower }} repositories"
-  ansible.builtin.include_tasks: "{{ ansible_distribution|lower }}.yml"
+  ansible.builtin.include_tasks: "main_repositories.yml"
   when: manage_repositories_enable_default_repo
 
 - name: "Import custom_repositories.yml"
