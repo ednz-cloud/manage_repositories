@@ -7,7 +7,7 @@
 - name: "Import prerequisites.yml"
   ansible.builtin.include_tasks: prerequisites.yml
 
-- name: "Import main {{ ansible_distribution|lower }} repositories"
+- name: "Import main repositories for {{ ansible_distribution|lower }}"
   ansible.builtin.include_tasks: "main_repositories.yml"
   when: manage_repositories_enable_default_repo
 

@@ -32,7 +32,7 @@
         replace: "{{ sources_list_new_content }}"
       when: sources_list_current_content_str != sources_list_new_content
 
-- name: "Configure {{ ansible_distribution|lower }} main repositories into sources.list"
+- name: "Configure main repositories into sources.list.d for {{ ansible_distribution|lower }} "
   ansible.builtin.deb822_repository:
     name: "{{ item.name }}"
     types: "{{item.types}}"
