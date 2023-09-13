@@ -68,10 +68,6 @@
               - stat_etc_apt_sources_list_d.stat.gr_name == 'root'
               - stat_etc_apt_sources_list_d.stat.mode == '0644'
 
-        - name: test
-          debug:
-            msg: "{{ slurp_etc_apt_sources_list_d.content|b64decode }}"
-
         - name: "Verify file /etc/apt/sources.list.d/{{ ansible_distribution|lower }}"
           vars:
             expected_source_list_content:
