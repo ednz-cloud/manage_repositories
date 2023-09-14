@@ -1,6 +1,0 @@
-# {{ ansible_managed }}
-
-{% for repository in repositories %}
-# {{ repository.comments}}
-{{ repository.type }} {% if repository.gpg_key is not none %}[signed-by=/usr/share/keyrings/{{ repository.filename }}-archive-keyring.asc] {% endif %}{{ repository.uri }} {{ repository.suites }} {{ repository.components }}
-{% endfor %}
