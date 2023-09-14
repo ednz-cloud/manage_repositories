@@ -3,5 +3,5 @@
 - name: "Update repositories caches"
   ansible.builtin.apt:
     update_cache: true
-    cache_valid_time: 3600
+    # cache_valid_time: 3600
   listen: "debian-based-cache-update"
