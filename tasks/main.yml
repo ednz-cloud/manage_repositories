@@ -14,3 +14,6 @@
 - name: "Import custom_repositories.yml"
   ansible.builtin.include_tasks: custom_repositories.yml
   when: manage_repositories_enable_custom_repo
+
+- name: "Update apt caches"
+  ansible.builtin.meta: flush_handlers
