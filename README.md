@@ -32,16 +32,20 @@ This variable sets the mirror URLs for the main repositories. You can optionally
 
 ```yaml
 manage_repositories_custom_repo: # by default, this variable is not defined
-  - uri: "https://apt.releases.hashicorp.com"
-    gpg_key: "https://apt.releases.hashicorp.com/gpg"
-    comments: "hashicorp repository"
-    type: "deb"
-    suites: "{{ ansible_distribution_release }}"
-    components: "main"
-    filename: "hashicorp"
-  - uri: ...
+  - name: docker
+    uri: "https://download.docker.com/linux/{{ ansible_distribution|lower }}"
+    comments: "{{ ansible_distribution|lower }} docker repository"
+    types:
+      - deb
+    suites:
+      - "{{ ansible_distribution_release }}"
+    components:
+      - stable
+    options:
+      Signed-By: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg"
+  - name: ...
 ```
-This variable contains a list (1 to N) of custom repositories to install. IT HAS  TO BE SET if `manage_repositories_enable_custom_repo == true`, or else the role might fail. Any unused field (like `gpg_key` in some instances) should be left blank (ex. `gpg_key:`). the role evaluates this against `None` to check if actions are needed.
+This variable contains a list (1 to N) of custom repositories to install. IT HAS  TO BE SET if `manage_repositories_enable_custom_repo == true`, or else the role might fail. The `options` entries are optional, and you can add pretty much all standard options. The `Signed-By` option expects a URL to download the gpg key. If no options are needed, the `options` key can be removed completely.
 
 Dependencies
 ------------
@@ -69,13 +73,17 @@ Example Playbook
         manage_repositories_enable_default_repo: false
         manage_repositories_enable_custom_repo: true
         manage_repositories_custom_repo:
-          - uri: "https://apt.releases.hashicorp.com"
-            gpg_key: "https://apt.releases.hashicorp.com/gpg"
-            comments: "hashicorp repository"
-            type: "deb"
-            suites: "{{ ansible_distribution_release }}"
-            components: "main"
-            filename: "hashicorp"
+          - name: docker
+            uri: "https://download.docker.com/linux/{{ ansible_distribution|lower }}"
+            comments: "{{ ansible_distribution|lower }} docker repository"
+            types:
+              - deb
+            suites:
+              - "{{ ansible_distribution_release }}"
+            components:
+              - stable
+            options:
+              Signed-By: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg"
 ```
 
 License
