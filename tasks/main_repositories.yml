@@ -1,5 +1,5 @@
 ---
-# task/debian file for manage_repositories
+# task/main_repositories file for manage_repositories
 - name: "Emtpy /etc/apt/sources.list"
   block:
     - name: "Read the current content of source.list"
