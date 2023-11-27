@@ -9,6 +9,7 @@
   when: item.options is defined
     and item.options['Signed-By'] is defined
     and item.options['Signed-By'] not in [None, '']
+  become: true
 
 - name: "Configure custom repositories"
   vars:
@@ -20,5 +21,6 @@
     owner: root
     group: root
   loop: "{{ manage_repositories_custom_repo }}"
+  become: true
   notify:
     - "debian-based-cache-update"
