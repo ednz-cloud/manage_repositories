@@ -7,7 +7,6 @@
         src: "{{ manage_repositories_sources_list_location }}"
       register: sources_list_current_content
       ignore_errors: true
-      become: true
 
     - name: "Convert sources.list current content to string"
       ansible.builtin.set_fact:
@@ -25,7 +24,6 @@
         group: root
         mode: '0644'
       when: sources_list_current_content_str == ''
-      become: true
 
     - name: "Replace content of /etc/apt/sources.list"
       ansible.builtin.replace:
@@ -33,7 +31,6 @@
         regexp: "{{ sources_list_current_content_str | regex_escape }}"
         replace: "{{ sources_list_new_content }}"
       when: sources_list_current_content_str != sources_list_new_content
-      become: true
 
 - name: "Configure main repositories into sources.list.d for {{ ansible_distribution|lower }} "
   ansible.builtin.deb822_repository:
@@ -43,6 +40,5 @@
     suites: "{{ item.suites | join(' ') }}"
     components: "{{ item.components }}"
   loop: "{{ manage_repositories_default_repo }}"
-  become: true
   notify:
     - "debian-based-cache-update"
