@@ -59,7 +59,7 @@ Example Playbook
 # calling the role inside a playbook with either the default or group_vars/host_vars
 - hosts: servers
   roles:
-    - ednxzu.manage_repositories
+    - ednz_cloud.manage_repositories
 ```
 
 ```yaml
@@ -68,7 +68,7 @@ Example Playbook
   tasks:
     - name: "Configure hashicorp repository"
       ansible.builtin.include_role:
-        name: ednxzu.manage_repositories
+        name: ednz_cloud.manage_repositories
       vars:
         manage_repositories_enable_default_repo: false
         manage_repositories_enable_custom_repo: true
