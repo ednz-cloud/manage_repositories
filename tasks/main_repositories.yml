@@ -1,38 +1,38 @@
 ---
 # task/main_repositories file for manage_repositories
-- name: "Emtpy /etc/apt/sources.list"
+- name: "APT Repo | Emtpy /etc/apt/sources.list"
   block:
-    - name: "Read the current content of source.list"
+    - name: "APT Repo | Read the current content of source.list"
       ansible.builtin.slurp:
         src: "{{ manage_repositories_sources_list_location }}"
       register: sources_list_current_content
       ignore_errors: true
 
-    - name: "Convert sources.list current content to string"
+    - name: "APT Repo | Convert sources.list current content to string"
       ansible.builtin.set_fact:
         sources_list_current_content_str: "{{ (sources_list_current_content.content | default('')) | b64decode }}"
 
-    - name: "Define sources.list new content"
+    - name: "APT Repo | Define sources.list new content"
       ansible.builtin.set_fact:
         sources_list_new_content: "{{ manage_repositories_sources_list_message }}"
 
-    - name: "Create file /etc/apt/sources.list"
+    - name: "APT Repo | Create file /etc/apt/sources.list"
       ansible.builtin.file:
         path: "{{ manage_repositories_sources_list_location }}"
         state: touch
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
       when: sources_list_current_content_str == ''
 
-    - name: "Replace content of /etc/apt/sources.list"
+    - name: "APT Repo | Replace content of /etc/apt/sources.list"
       ansible.builtin.replace:
         path: "{{ manage_repositories_sources_list_location }}"
         regexp: "{{ sources_list_current_content_str | regex_escape }}"
         replace: "{{ sources_list_new_content }}"
       when: sources_list_current_content_str != sources_list_new_content
 
-- name: "Configure main repositories into sources.list.d for {{ ansible_distribution|lower }} "
+- name: "APT Repo | Configure main repositories into sources.list.d for {{ ansible_distribution|lower }} "
   ansible.builtin.deb822_repository:
     name: "{{ item.name }}"
     types: "{{item.types}}"
@@ -40,5 +40,10 @@
     suites: "{{ item.suites | join(' ') }}"
     components: "{{ item.components }}"
   loop: "{{ manage_repositories_default_repo }}"
-  notify:
-    - "debian-based-cache-update"
+  register: _apt_default_repositories
+
+- name: "APT Repo | Set cache-update variable"
+  ansible.builtin.set_fact:
+    _manage_repositories_need_cache_update: true
+  when:
+    - _apt_default_repositories.changed

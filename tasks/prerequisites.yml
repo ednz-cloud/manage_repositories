@@ -1,7 +1,12 @@
 ---
 # task/prerequisites file for manage_repositories
-- name: "Install python dependencies"
-  ansible.builtin.include_role:
-    name: ednz_cloud.manage_apt_packages
-  vars:
-    manage_apt_packages_list: "{{ manage_repositories_required_packages }}"
+- name: "APT Repo | Update repositories cache"
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: "APT Repo | Install required packages"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ manage_repositories_required_packages }}"
