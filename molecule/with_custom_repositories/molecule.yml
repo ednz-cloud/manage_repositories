@@ -22,7 +22,7 @@ provisioner:
 verifier:
   name: ansible
 scenario:
-  name: with_custom_repo
+  name: with_custom_repositories
   test_sequence:
     - dependency
     - cleanup
