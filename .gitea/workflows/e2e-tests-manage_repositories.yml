@@ -1,0 +1,46 @@
+---
+name: test
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+    branches:
+      - main
+
+jobs:
+  retrieve-credentials:
+    name: Retrieve Credentials
+    runs-on: ubuntu-latest
+    outputs:
+      registry-username: ${{ steps.import-secrets.outputs.GITEA_ACTIONS_USERNAME }}
+      registry-token: ${{ steps.import-secrets.outputs.GITEA_ACTIONS_TOKEN }}
+    steps:
+      - name: Get secrets from vault
+        id: import-secrets
+        uses: hashicorp/vault-action@v3
+        with:
+          url: "https://vault.ednz.fr"
+          method: approle
+          roleId: ${{ secrets.VAULT_APPROLE_ID }}
+          secretId: ${{ secrets.VAULT_APPROLE_SECRET_ID }}
+          secrets: |
+            kv/data/applications/gitea/users/actions username | GITEA_ACTIONS_USERNAME ;
+            kv/data/applications/gitea/users/actions token_write | GITEA_ACTIONS_TOKEN ;
+
+  end_to_end_role:
+    needs: retrieve-credentials
+    strategy:
+      matrix:
+        test_os:
+          ["debian11", "debian12", "ubuntu2004", "ubuntu2204", "ubuntu2404"]
+        scenario: ["default", "with_custom_repositories"]
+    uses: ./.gitea/workflows/e2e-tests.yml
+    with:
+      role: docker_systemd_service
+      scenario: ${{ matrix.scenario }}
+      test_os: ${{ matrix.test_os }}
+    secrets:
+      GITEA_ACTIONS_USERNAME: ${{ needs.retrieve-credentials.outputs.registry-username }}
+      GITEA_ACTIONS_TOKEN: ${{ needs.retrieve-credentials.outputs.registry-token }}
