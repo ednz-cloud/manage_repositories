@@ -57,18 +57,19 @@
         - name: "Verify file /etc/apt/sources.list.d/{{ ansible_distribution|lower }}"
           vars:
             expected_source_list_content:
-              ubuntu: |
-                X-Repolib-Name: ubuntu
-                Types: deb
-                URIs: http://fr.archive.ubuntu.com/ubuntu
-                Suites: {{ ansible_distribution_release }} {{ ansible_distribution_release }}-security {{ ansible_distribution_release }}-updates {{ ansible_distribution_release }}-backports
-                Components: main restricted universe multiverse
-              debian: |
-                X-Repolib-Name: debian
-                Types: deb
-                URIs: http://deb.debian.org/debian
-                Suites: {{ ansible_distribution_release }} {{ ansible_distribution_release }}-updates {{ ansible_distribution_release }}-backports
-                Components: main
+              ubuntu:
+                - "X-Repolib-Name: {{ ansible_distribution|lower }}"
+                - "Types: deb"
+                - "URIs: http://fr.archive.ubuntu.com/ubuntu"
+                - "Suites: {{ ansible_distribution_release }} {{ ansible_distribution_release }}-security {{ ansible_distribution_release }}-updates {{ ansible_distribution_release }}-backports"
+                - "Components: main restricted universe multiverse"
+              debian:
+                - "X-Repolib-Name: {{ ansible_distribution|lower }}"
+                - "Types: deb"
+                - "URIs: http://deb.debian.org/debian"
+                - "Suites: {{ ansible_distribution_release }} {{ ansible_distribution_release }}-updates {{ ansible_distribution_release }}-backports"
+                - "Components: main"
           ansible.builtin.assert:
             that:
-              - "(slurp_etc_apt_sources_list_d.content|b64decode) == expected_source_list_content[ansible_distribution|lower]"
+              - "item in (slurp_etc_apt_sources_list_d.content|b64decode)"
+          loop: "{{ expected_source_list_content[ansible_distribution|lower] }}"

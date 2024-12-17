@@ -1,7 +1,0 @@
----
-- name: Converge
-  hosts: all
-  tasks:
-    - name: "Include ednz_cloud.manage_repositories"
-      ansible.builtin.include_role:
-        name: "ednz_cloud.manage_repositories"
