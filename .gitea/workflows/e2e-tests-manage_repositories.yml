@@ -36,7 +36,7 @@ jobs:
         test_os:
           ["debian11", "debian12", "ubuntu2004", "ubuntu2204", "ubuntu2404"]
         scenario: ["default", "with_custom_repositories"]
-    uses: https://git.ednz.fr/github-actions/library/workflows/molecule-e2e-test.yml@main
+    uses: https://git.ednz.fr/github-actions/library/.gitea/workflows/molecule-e2e-test.yml@main
     with:
       role: manage_repositories
       scenario: ${{ matrix.scenario }}
