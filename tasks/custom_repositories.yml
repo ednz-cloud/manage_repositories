@@ -14,4 +14,4 @@
   ansible.builtin.set_fact:
     _manage_repositories_need_cache_update: true
   when:
-    - _apt_custom_repositories.changed
+    - _apt_custom_repositories.changed # noqa: no-handler
