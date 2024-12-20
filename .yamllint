@@ -15,7 +15,8 @@ rules:
   commas:
     max-spaces-after: -1
     level: error
-  comments: enable
+  comments:
+    min-spaces-from-content: 1
   comments-indentation: disable
   document-start: enable
   empty-lines:
@@ -31,10 +32,13 @@ rules:
   new-line-at-end-of-file: enable
   new-lines:
     type: unix
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
   trailing-spaces: enable
   truthy:
     allowed-values:
-      - 'true'
-      - 'false'
-      - 'yes'
-      - 'no'
+      - "true"
+      - "false"
+      - "yes"
+      - "no"
