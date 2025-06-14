@@ -22,6 +22,5 @@
 - name: "APT Repo | Update apt caches"
   ansible.builtin.apt:
     update_cache: true
-    cache_valid_time: 3600
   when:
     - _manage_repositories_need_cache_update
