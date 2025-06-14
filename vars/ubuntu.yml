@@ -1,5 +1,9 @@
 ---
 # vars file for manage_repositories
+
+# title: Default repository configuration for Ubuntu distributions.
+# required: true
+# description: This variable defines the default repositories for Ubuntu distributions.
 manage_repositories_default_repo:
   - name: ubuntu
     uri: "{{ manage_repositories_main_repo_uri[ansible_distribution|lower] }}"

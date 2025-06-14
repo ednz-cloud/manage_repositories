@@ -17,4 +17,11 @@ repos:
       - id: commitizen-branch
         stages:
           - post-commit
-          - push
+          - pre-push
+  - repo: local
+    hooks:
+      - id: docsible-check
+        name: Ensure docsible documentation is up-to-date
+        entry: bash -c 'docsible --role ./ --no-backup && git diff --exit-code'
+        language: system
+        pass_filenames: false

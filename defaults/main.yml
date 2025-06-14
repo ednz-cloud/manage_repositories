@@ -1,7 +1,50 @@
 ---
 # defaults file for manage_repositories
+
+# title: Enable or disable the default repository management.
+# required: false
+# description-lines:
+# Enable or disable the default repository management.
+# If set to true, the default repositories for the distribution will be managed.
 manage_repositories_enable_default_repo: true
-manage_repositories_enable_custom_repo: false
+
+# title: The main repository URI for the distribution.
+# required: true
+# description-lines:
+# The main repository URI for the distribution.
+# This is used to set the main repository for the distribution.
 manage_repositories_main_repo_uri:
   ubuntu: "http://fr.archive.ubuntu.com/ubuntu"
   debian: "http://deb.debian.org/debian"
+
+# title: Enable or disable the custom repository management.
+# required: false
+# description-lines:
+# Enable or disable the custom repository management.
+manage_repositories_enable_custom_repo: false
+
+# title: Custom repositories to be managed.
+# required: false
+# description-lines:
+# A list of custom repositories to be managed.
+# Each repository should be a dictionary with the following keys:
+# - name: The name of the repository.
+# - uri: The URI of the repository.
+# - comments: A comment for the repository.
+# - types: The types of the repository (e.g., deb, rpm).
+# - suites: The suites of the repository (e.g., stable, testing).
+# - components: The components of the repository (e.g., main, universe).
+# - signed_by: The URI of the GPG key for the repository. (optional).
+# See the deb822 module documentation for more details.
+# Example:
+# - name: docker
+#   uri: "https://download.docker.com/linux/{{ ansible_distribution|lower }}"
+#   comments: "{{ ansible_distribution|lower }} docker repository"
+#   types:
+#     - deb
+#   suites:
+#     - "{{ ansible_distribution_release }}"
+#   components:
+#     - stable
+#   signed_by: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg"
+manage_repositories_custom_repo: []

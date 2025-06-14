@@ -1,7 +1,27 @@
 ---
 # vars file for manage_repositories
+
+# title: Location of the sources list file.
+# required: true
+# description: This variable defines the location of the sources list file for the package manager.
 manage_repositories_sources_list_location: /etc/apt/sources.list
+
+# title: Location of the repository files.
+# required: true
+# description: This variable defines the location of the repository files for the package manager.
 manage_repositories_repo_location: /etc/apt/sources.list.d
+
+# title: Location of the signing keys.
+# required: true
+# description: This variable defines the location of the signing keys for the package manager.
 manage_repositories_signing_keys_location: /usr/share/keyrings
+
+# title: Comment for the sources list file.
+# required: true
+# description: This variable defines the comment for the sources list file (because it is not used).
 manage_repositories_sources_list_message: "# See /etc/apt/sources.list.d/{{ ansible_distribution|lower }}.sources\\n"
+
+# title: Required packages for managing repositories.
+# required: true
+# description: This variable defines the packages required for managing repositories.
 manage_repositories_required_packages: ["python3-debian"]
