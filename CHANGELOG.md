@@ -1,3 +1,9 @@
+## v0.2.0 (2025-06-14)
+
+### Feat
+
+- remove validity timeout for cache update
+
 ## v0.1.0 (2024-12-20)
 
 ### Feat
